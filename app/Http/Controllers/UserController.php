@@ -10,12 +10,12 @@ use Illuminate\Support\Facades\Hash;
 
 class UserController extends Controller
 {
-    /**
-     * Menampilkan daftar user.
-     */
+
+    //menampilkan data user
     public function index(Request $request)
     {
-        // Fitur pencarian sederhana (opsional)
+
+        // Fitur pencarian sederhana
         $query = User::query();
 
         if ($request->has('search')) {
@@ -28,17 +28,15 @@ class UserController extends Controller
         return view('admin.users.index', compact('users'));
     }
 
-    /**
-     * Form tambah user.
-     */
+
+    //form data user
     public function create()
     {
         return view('admin.users.create');
     }
 
-    /**
-     * Simpan user baru.
-     */
+
+    //simpan data baru
     public function store(Request $request)
     {
         $request->validate([
@@ -51,7 +49,7 @@ class UserController extends Controller
         $user = User::create([
             'name'     => $request->name,
             'email'    => $request->email,
-            'password' => Hash::make($request->password),
+            'password' => Hash::make($request->password), // Enkripsi password
             'role'     => $request->role,
         ]);
 
@@ -60,24 +58,22 @@ class UserController extends Controller
         return redirect()->route('users.index')->with('success', 'User berhasil ditambahkan.');
     }
 
-    /**
-     * Form edit user.
-     */
+
+    //form edit user
     public function edit(User $user)
     {
         return view('admin.users.edit', compact('user'));
     }
 
-    /**
-     * Update data user.
-     */
+
+    //update data user
     public function update(Request $request, User $user)
     {
         $request->validate([
             'name'     => 'required|string|max:255',
             'email'    => 'required|email|unique:users,email,' . $user->id,
             'role'     => 'required|in:admin,petugas,peminjam',
-            'password' => 'nullable|min:6',
+            'password' => 'nullable|min:6', // Password boleh kosong jika tidak ingin diganti
         ]);
 
         $data = [
@@ -94,13 +90,12 @@ class UserController extends Controller
         $user->update($data);
 
         ActivityLog::record('Update User', 'Memperbarui data user: ' . $user->name);
-
         return redirect()->route('users.index')->with('success', 'Data user diperbarui.');
     }
 
-    /**
-     * Hapus user.
-     */
+
+    
+    //hapus user
     public function destroy(User $user)
     {
         // Mencegah admin menghapus akunnya sendiri yang sedang login
