@@ -26,7 +26,10 @@
 @csrf
 <button class="btn btn-success btn-sm">Setujui</button>
 </form>
-<button class="btn btn-danger btn-sm">Tolak</button>
+<form action="{{ url('/petugas/reject/'.$loan->id) }}" method="POST" class="d-inline">
+    @csrf
+    <button class="btn btn-danger btn-sm">Tolak</button>
+</form>
 </td>
 </tr>
 @empty
@@ -78,7 +81,6 @@
 <th>Alat</th>
 <th>Status</th>
 </tr>
-31
 </thead>
 <tbody>
 @foreach($sudahDikembalikan as $sudah)

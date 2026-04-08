@@ -6,6 +6,7 @@ use App\Models\Loan;
 use App\Models\Tool;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Auth;
+use App\Models\ActivityLog;
 
 class PetugasController extends Controller
 {
@@ -36,6 +37,22 @@ class PetugasController extends Controller
         $tool->decrement('stok');
 
         return back()->with('success', 'Peminjaman disetujui.');
+    }
+
+    public function reject($id)
+    {
+        $loan = loan::findOrFail($id);
+
+        $loan->update([
+            'status' => 'ditolak',
+            'petugas_id' => Auth::id()
+        ]);
+
+        //masukan aktivitas penolakan ke log aktivitas
+        ActivityLog::record('Tolak peminjaman', 'peminjaman alat' . $loan->tool->nama_alat . 'oleh' . $loan->user->name . 'ditolak.');
+
+        return back()->with('success', 'peminjaman ditolak');
+        
     }
 
     public function processReturn($id)

@@ -19,7 +19,8 @@ return new class extends Migration
         $table->date('tanggal_kembali_rencana');
         $table->date('tanggal_kembali_aktual')->nullable();
         // Status: pending, disetujui, ditolak, kembali
-        $table->enum('status', ['pending', 'disetujui', 'ditolak', 'kembali'])->default('pending');
+        $table->enum('status', ['pending', 'disetujui', 'ditolak', 'kembali',])->default('pending');
+    
         $table->foreignId('petugas_id')->nullable()->constrained('users'); // Siapa yang menyetujui
         $table->timestamps();
     });

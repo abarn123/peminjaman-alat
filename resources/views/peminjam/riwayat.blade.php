@@ -12,6 +12,7 @@
                         <th>Tgl Pinjam</th>
                         <th>Rencana Kembali</th>
                         <th>Status</th>
+                        <th>Dikembalikan</th>
                         <th>Catatan</th>
                     </tr>
                 </thead>
@@ -31,19 +32,35 @@
                                 @elseif($loan->status == 'ditolak')
                                     <span class="badge bg-danger">Ditolak</span>
                                 @endif
-                             </td>
-                            <td>
+                              </td>
+                              <td>
+                                @if($loan->status == 'kembali' && $loan->tanggal_kembali_aktual)
+                                    @php
+                                        $rencana = strtotime($loan->tanggal_kembali_rencana);
+                                        $aktual = strtotime($loan->tanggal_kembali_aktual);
+                                        $isLate = $aktual > $rencana;
+                                    @endphp
+                                    @if($isLate)
+                                        <span class="badge bg-danger">Telat</span>
+                                    @else
+                                        <span class="badge bg-success">Tepat Waktu</span>
+                                    @endif
+                                @else
+                                    <span class="text-muted">-</span>
+                                @endif
+                              </td>
+                              <td>
                                 @if($loan->status == 'disetujui')
                                     <small class="text-muted">Harap kembalikan ke petugas sebelum tanggal rencana.</small>
                                 @elseif($loan->status == 'kembali')
                                     <small class="text-success">Diterima tanggal {{ $loan->tanggal_kembali_aktual }}</small>
                                 @endif
-                             </td>
-                         </tr>
+                              </td>
+                        </tr>
                     @empty
-                         <tr>
-                             <td colspan="5">Belum ada riwayat peminjaman.</td>
-                         </tr>
+                        <tr>
+                            <td colspan="6">Belum ada riwayat peminjaman.</td>
+                        </tr>
                     @endforelse
                 </tbody>
             </table>

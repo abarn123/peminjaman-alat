@@ -39,6 +39,9 @@
                             </td>
                             <td>{{ $r->petugas ? $r->petugas->name : 'Admin' }}</td>
                             <td>
+                                @if($r->tanggal_kembali_aktual > $r->tanggal_kembali_rencana)
+                                    <a href="{{ route('admin.returns.denda', $r->id) }}" class="btn btn-warning btn-sm">Denda</a>
+                                @endif
                                 <a href="{{ route('admin.returns.edit', $r->id) }}" class="btn btn-warning btn-sm">Edit</a>
                                 <form action="{{ route('admin.returns.destroy', $r->id) }}" method="POST" class="d-inline" onsubmit="return confirm('Hapus riwayat ini?');">
                                     @csrf

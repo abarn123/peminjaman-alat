@@ -3,6 +3,7 @@
 namespace App\Http\Controllers;
 
 use Illuminate\Http\Request;
+use Illuminate\Support\Carbon;
 use App\Models\Loan;
 use App\Models\Tool;
 use App\Models\ActivityLog;
@@ -15,7 +16,7 @@ class AdminReturnController extends Controller
     public function index()
     {
         // Ambil hanya yang statusnya 'kembali'
-        $returns = Loan::with(['user', 'tool'])
+        $returns = Loan::with(['user', 'tool', 'petugas'])
             ->where('status', 'kembali')
             ->latest('tanggal_kembali_aktual')
             ->paginate(10);
@@ -23,10 +24,7 @@ class AdminReturnController extends Controller
         return view('admin.returns.index', compact('returns'));
     }
 
-    /**
-     * CREATE (Form): Menampilkan daftar alat yang SEDANG DIPINJAM
-     * Admin memilih dari sini untuk dikembalikan.
-     */
+    //menampilkan data alat
     public function create()
     {
         // Ambil data yang statusnya 'disetujui' (Sedang di luar)
@@ -38,36 +36,63 @@ class AdminReturnController extends Controller
         return view('admin.returns.create', compact('activeLoans'));
     }
 
-    /**
-     * STORE: Proses Simpan Pengembalian (Action)
-     */
+    //simpan pengembalian
     public function store(Request $request)
+{
+    $request->validate([
+        'loan_id' => 'required|exists:loans,id',
+    ]);
+
+    $loan = Loan::findOrFail($request->loan_id);
+
+    if ($loan->status != 'disetujui') {
+        return back()->with('error', 'Data tidak valid atau sudah dikembalikan.');
+    }
+
+    $returnedAt = now();
+    $isLate = $returnedAt->gt(Carbon::parse($loan->tanggal_kembali_rencana));
+
+    $loan->update([
+        'status'                 => 'kembali',
+        'tanggal_kembali_aktual' => $returnedAt,
+        'terlambat'              => $isLate,
+        'denda'                  => 0,
+    ]);
+
+    $tool = Tool::findOrFail($loan->tool_id);
+    $tool->increment('stok');
+
+    ActivityLog::record('Pengembalian (Admin)', 'Memproses pengembalian alat: ' . $tool->nama_alat);
+
+    return redirect()->route('admin.returns.index')->with('success', 'Alat berhasil dikembalikan.');
+}
+
+
+        public function showFineForm($id)
     {
-        $request->validate([
-            'loan_id' => 'required|exists:loans,id',
-            'denda'   => 'nullable|integer' // Opsional jika mau ada denda
-        ]);
+        $loan = Loan::with(['user', 'tool'])->findOrFail($id);
 
-        $loan = Loan::findOrFail($request->loan_id);
-
-        if ($loan->status != 'disetujui') {
-            return back()->with('error', 'Data tidak valid atau sudah dikembalikan.');
+        if (!$loan->terlambat && !$loan->isLate()) {
+            return redirect()->route('admin.returns.index')->with('error', 'Loan tidak terlambat.');
         }
 
-        // 1. Update Status & Tanggal
-        $loan->update([
-            'status'                  => 'kembali',
-            'tanggal_kembali_aktual'  => now(),
-            // 'denda' => $request->denda // Jika tabel loans punya kolom denda
+        $calculatedFine = $loan->calculateFine();
+
+        return view('admin.returns.denda', compact('loan', 'calculatedFine'));
+    }
+
+    public function storeFine(Request $request, $id)
+    {
+        $request->validate([
+            'denda' => 'required|integer|min:0',
         ]);
 
-        // 2. Kembalikan Stok Alat
-        $tool = Tool::findOrFail($loan->tool_id);
-        $tool->increment('stok');
+        $loan = Loan::findOrFail($id);
+        $loan->update(['denda' => $request->denda]);
 
-        ActivityLog::record('Pengembalian (Admin)', 'Memproses pengembalian alat: ' . $tool->nama_alat);
+        ActivityLog::record('Denda Ditambahkan', 'Denda Rp ' . number_format($request->denda) . ' untuk loan ID ' . $loan->id);
 
-        return redirect()->route('admin.returns.index')->with('success', 'Alat berhasil dikembalikan.');
+        return redirect()->route('admin.returns.index')->with('success', 'Denda berhasil disimpan.');
     }
 
     /**
