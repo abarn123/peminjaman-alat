@@ -33,7 +33,7 @@
         <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 text-center">
             <h1 class="text-4xl md:text-5xl font-bold mb-4">Peminjaman Alat Jadi Lebih Mudah</h1>
             <p class="text-lg md:text-xl text-gray-300 max-w-3xl mx-auto mb-8">
-                Sistem manajemen peminjaman alat laboratorium dan bengkel sekolah yang terintegrasi, cepat, dan transparan.
+                Sistem manajemen peminjaman alat  dan bengkel sekolah yang terintegrasi, cepat, dan transparan.
             </p>
             <a href="{{ route('login') }}" class="inline-block px-8 py-3 text-base font-semibold text-gray-900 bg-yellow-400 hover:bg-yellow-500 rounded-lg transition duration-200 shadow-md">
                 Mulai Peminjaman

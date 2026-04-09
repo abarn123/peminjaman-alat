@@ -31,27 +31,24 @@ class AuthController extends Controller
             'password' => ['required'],
         ]);
 
-        if (Auth::attempt($credentials)) {
+        if (Auth::attempt($credentials, $request->boolean('remember'))) {
             $request->session()->regenerate();
 
             // Redirect berdasarkan role
             if (Auth::user()->role == "admin") {
                 return redirect('/admin/dashboard');
             }
-
             if (Auth::user()->role == "petugas") {
                 return redirect('/petugas/dashboard');
             }
-
             // Default untuk role peminjam
             ActivityLog::record('Login', 'Pengguna melakukan login');
-            
             return redirect('/peminjam/dashboard');
         }
 
         return back()->withErrors([
-            'email' => 'Login gagal.'
-        ]);
+            'email' => 'Email atau password salah.'
+        ])->onlyInput('email');
     }
 
     /**

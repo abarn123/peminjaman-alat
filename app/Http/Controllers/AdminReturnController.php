@@ -37,7 +37,7 @@ class AdminReturnController extends Controller
     }
 
     //simpan pengembalian
-    public function store(Request $request)
+   public function store(Request $request)
 {
     $request->validate([
         'loan_id' => 'required|exists:loans,id',
@@ -52,11 +52,14 @@ class AdminReturnController extends Controller
     $returnedAt = now();
     $isLate = $returnedAt->gt(Carbon::parse($loan->tanggal_kembali_rencana));
 
+    $loan->tanggal_kembali_aktual = $returnedAt;
+    $denda = $isLate ? $loan->calculateFine() : 0;
+
     $loan->update([
         'status'                 => 'kembali',
         'tanggal_kembali_aktual' => $returnedAt,
         'terlambat'              => $isLate,
-        'denda'                  => 0,
+        'denda'                  => $denda,
     ]);
 
     $tool = Tool::findOrFail($loan->tool_id);

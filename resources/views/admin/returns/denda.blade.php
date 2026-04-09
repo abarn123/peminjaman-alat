@@ -12,7 +12,7 @@
             <p><strong>Tanggal Kembali Rencana:</strong> {{ $loan->tanggal_kembali_rencana }}</p>
             <p><strong>Tanggal Kembali Aktual:</strong> {{ $loan->tanggal_kembali_aktual }}</p>
             <p><strong>Status:</strong> {{ $loan->status }}</p>
-            <p><strong>Denda Terhitung:</strong> Rp {{ number_format($calculatedFine) }}</p>
+            <p><strong>Denda Terhitung:</strong> Rp {{ number_format($loan->denda !== null ? $loan->denda : $calculatedFine, 0, ',', '.') }}</p>
         </div>
     </div>
 
@@ -20,7 +20,8 @@
         @csrf
         <div class="mb-3">
             <label class="form-label">Denda (Rp)</label>
-            <input type="number" name="denda" class="form-control" value="{{ old('denda', $loan->denda ?: $calculatedFine) }}" required>
+            <input type="number" name="denda" class="form-control"
+                value="{{ old('denda', $loan->denda !== null ? $loan->denda : $calculatedFine) }}" required>
         </div>
         <button type="submit" class="btn btn-primary">Simpan Denda</button>
         <a href="{{ route('admin.returns.index') }}" class="btn btn-secondary">Kembali</a>

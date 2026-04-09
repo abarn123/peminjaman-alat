@@ -40,10 +40,12 @@ Route::middleware(['auth', 'role:admin'])->group(function(){
     Route::resource('admin/returns', AdminReturnController::class)->names('admin.returns');
     Route::get('/admin/returns/{id}/fine', [AdminReturnController::class, 'showFineForm'])->name('admin.returns.fine');
     Route::post('/admin/returns/{id}/fine', [AdminReturnController::class, 'storeFine']);
-    Route::get('/admin/logs', function(){
-        $logs = ActivityLog::with('user')->latest()->get();
-        return view('admin.logs', compact('logs'));
-    });
+    Route::get('/admin/returns/{id}/denda', [AdminReturnController::class, 'showFineForm'])->name('admin.returns.denda');
+    Route::post('/admin/returns/{id}/denda', [AdminReturnController::class, 'storeFine']);
+    Route::get('/admin/logs', function () {
+        $logs = ActivityLog::with('user')->latest()->paginate(15);
+        return view('admin.logs.index', compact('logs'));
+    })->name('admin.logs.index');
     //CRUD peminjaman (admin bisa full akses)
 }); 
 
@@ -64,5 +66,3 @@ Route::middleware(['auth', 'role:peminjam'])->group(function () {
     Route::get('/peminjam/riwayat', [PeminjamController::class, 'history']); // Riwayat & Kembalikan
 });
 
-Route::get('/admin/returns/{id}/denda', [AdminReturnController::class, 'showFineForm'])->name('admin.returns.denda');
-Route::post('/admin/returns/{id}/denda', [AdminReturnController::class, 'storeFine']);
