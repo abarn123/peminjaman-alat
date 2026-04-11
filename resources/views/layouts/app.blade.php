@@ -17,7 +17,7 @@
 <body class="bg-gray-50 antialiased">
 
     <!-- NAVBAR / HEADER -->
-    <nav class="bg-white border-b border-gray-200 shadow-sm sticky top-0 z-50">
+    <nav class="bg-white border-b border-gray-200 shadow-sm sticky top-0 z-50" x-data="{ mobileMenuOpen: false }" @keydown.escape.window="mobileMenuOpen = false">
         <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
             <div class="flex justify-between items-center h-16">
                <!-- Logo / Brand -->
@@ -29,7 +29,7 @@
                 </div>
 
                 <!-- Menu navbar (Desktop) -->
-                <div class="hidden md:flex items-center space-x-1">
+                <div class="hidden md:flex items-center space-x-1 ml-auto mr-6">
                     <ul class="flex space-x-1">
                         @auth
                             <!-- MENU UNTUK ROLE ADMIN -->
@@ -51,7 +51,7 @@
                                         <svg class="w-4 h-4 mr-2" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                                             <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M7 7h.01M7 3h5c.512 0 1.024.195 1.414.586l5 5a2 2 0 01.586 1.414V19a2 2 0 01-2 2H7a2 2 0 01-2-2V5a2 2 0 012-2z"></path>
                                         </svg>
-                                        Kelola Kategori
+                                        Kategori
                                     </a>
                                 </li>
                                 <li>
@@ -62,7 +62,7 @@
                                             <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M10.325 4.317c.426-1.756 2.924-1.756 3.35 0a1.724 1.724 0 002.573 1.066c1.543-.94 3.31.826 2.37 2.37a1.724 1.724 0 001.065 2.572c1.756.426 1.756 2.924 0 3.35a1.724 1.724 0 00-1.066 2.573c.94 1.543-.826 3.31-2.37 2.37a1.724 1.724 0 00-2.572 1.065c-.426 1.756-2.924 1.756-3.35 0a1.724 1.724 0 00-2.573-1.066c-1.543.94-3.31-.826-2.37-2.37a1.724 1.724 0 00-1.065-2.572c-1.756-.426-1.756-2.924 0-3.35a1.724 1.724 0 001.066-2.573c-.94-1.543.826-3.31 2.37-2.37.996.608 2.296.07 2.572-1.065z"></path>
                                             <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 12a3 3 0 11-6 0 3 3 0 016 0z"></path>
                                         </svg>
-                                        Kelola Alat
+                                        Alat
                                     </a>
                                 </li>
                                 <li>
@@ -72,7 +72,7 @@
                                         <svg class="w-4 h-4 mr-2" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                                             <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 4.354a4 4 0 110 5.292M15 21H3v-1a6 6 0 0112 0v1zm0 0h6v-1a6 6 0 00-9-5.197M13 7a4 4 0 11-8 0 4 4 0 018 0z"></path>
                                         </svg>
-                                        Kelola User
+                                        User
                                     </a>
                                 </li>
                                 <li>
@@ -82,7 +82,7 @@
                                         <svg class="w-4 h-4 mr-2" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                                             <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 5H7a2 2 0 00-2 2v12a2 2 0 002 2h10a2 2 0 002-2V7a2 2 0 00-2-2h-2M9 5a2 2 0 002 2h2a2 2 0 002-2M9 5a2 2 0 012-2h2a2 2 0 012 2"></path>
                                         </svg>
-                                        Kelola Peminjaman
+                                        Peminjaman
                                     </a>
                                 </li>
                                 <li>
@@ -92,7 +92,7 @@
                                         <svg class="w-4 h-4 mr-2" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                                             <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 4v5h.582m15.356 2A8.001 8.001 0 004.582 9m0 0H9m11 11v-5h-.581m0 0a8.003 8.003 0 01-15.357-2m15.357 2H15"></path>
                                         </svg>
-                                        Kelola Pengembalian
+                                        Pengembalian
                                     </a>
                                 </li>
 
@@ -148,6 +148,17 @@
 
                 <!-- Menu Kanan (Profil & Logout) dengan Avatar -->
                 <div class="flex items-center space-x-3">
+                    <button type="button"
+                            class="md:hidden inline-flex items-center justify-center w-9 h-9 rounded-lg border border-gray-200 text-gray-600 hover:bg-gray-100"
+                            @click="mobileMenuOpen = !mobileMenuOpen"
+                            aria-label="Buka menu navigasi">
+                        <svg x-show="!mobileMenuOpen" class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 6h16M4 12h16M4 18h16"></path>
+                        </svg>
+                        <svg x-show="mobileMenuOpen" x-cloak class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12"></path>
+                        </svg>
+                    </button>
                     @auth
                         <!-- Dropdown User dengan Avatar -->
                         <div class="relative" x-data="{ open: false }" @click.away="open = false">
@@ -197,6 +208,28 @@
                 </div>
             </div>
         </div>
+
+        <!-- Menu navbar (Mobile) -->
+        <div class="md:hidden border-t border-gray-100" x-show="mobileMenuOpen" x-cloak>
+            <div class="px-4 py-3 space-y-1">
+                @auth
+                    @if(auth()->user()->role == 'admin')
+                        <a href="/admin/dashboard" class="block px-3 py-2 rounded-lg text-sm {{ request()->is('admin/dashboard') ? 'bg-blue-50 text-blue-700' : 'text-gray-700 hover:bg-gray-100' }}">Dashboard</a>
+                        <a href="{{ route('categories.index') }}" class="block px-3 py-2 rounded-lg text-sm {{ request()->routeIs('categories.*') ? 'bg-blue-50 text-blue-700' : 'text-gray-700 hover:bg-gray-100' }}">Kategori</a>
+                        <a href="{{ route('tools.index') }}" class="block px-3 py-2 rounded-lg text-sm {{ request()->routeIs('tools.*') ? 'bg-blue-50 text-blue-700' : 'text-gray-700 hover:bg-gray-100' }}">Alat</a>
+                        <a href="{{ route('users.index') }}" class="block px-3 py-2 rounded-lg text-sm {{ request()->routeIs('users.*') ? 'bg-blue-50 text-blue-700' : 'text-gray-700 hover:bg-gray-100' }}">User</a>
+                        <a href="{{ route('admin.loans.index') }}" class="block px-3 py-2 rounded-lg text-sm {{ request()->routeIs('admin.loans.*') ? 'bg-blue-50 text-blue-700' : 'text-gray-700 hover:bg-gray-100' }}">Peminjaman</a>
+                        <a href="{{ route('admin.returns.index') }}" class="block px-3 py-2 rounded-lg text-sm {{ request()->routeIs('admin.returns.*') ? 'bg-blue-50 text-blue-700' : 'text-gray-700 hover:bg-gray-100' }}">Pengembalian</a>
+                    @elseif(auth()->user()->role == 'petugas')
+                        <a href="/petugas/dashboard" class="block px-3 py-2 rounded-lg text-sm {{ request()->is('petugas/dashboard') ? 'bg-blue-50 text-blue-700' : 'text-gray-700 hover:bg-gray-100' }}">Validasi Peminjaman</a>
+                        <a href="/petugas/laporan" class="block px-3 py-2 rounded-lg text-sm {{ request()->is('petugas/laporan') ? 'bg-blue-50 text-blue-700' : 'text-gray-700 hover:bg-gray-100' }}">Laporan</a>
+                    @elseif(auth()->user()->role == 'peminjam')
+                        <a href="/peminjam/dashboard" class="block px-3 py-2 rounded-lg text-sm {{ request()->is('peminjam/dashboard') ? 'bg-blue-50 text-blue-700' : 'text-gray-700 hover:bg-gray-100' }}">Daftar Alat</a>
+                        <a href="/peminjam/riwayat" class="block px-3 py-2 rounded-lg text-sm {{ request()->is('peminjam/riwayat') ? 'bg-blue-50 text-blue-700' : 'text-gray-700 hover:bg-gray-100' }}">Riwayat Saya</a>
+                    @endif
+                @endauth
+            </div>
+        </div>
     </nav>
 
     <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-8">
@@ -233,6 +266,7 @@
 
     <!-- Alpine.js untuk dropdown -->
     <script defer src="https://cdn.jsdelivr.net/npm/alpinejs@3.x.x/dist/cdn.min.js"></script>
+    
     <style>
         [x-cloak] { display: none !important; }
     </style>

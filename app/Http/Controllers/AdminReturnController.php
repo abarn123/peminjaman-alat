@@ -4,15 +4,14 @@ namespace App\Http\Controllers;
 
 use Illuminate\Http\Request;
 use Illuminate\Support\Carbon;
+use Illuminate\Support\Facades\Storage;
 use App\Models\Loan;
 use App\Models\Tool;
 use App\Models\ActivityLog;
 
 class AdminReturnController extends Controller
 {
-    /**
-     * READ: Menampilkan Riwayat Pengembalian (History)
-     */
+    //menampilkan data pengembalian
     public function index()
     {
         // Ambil hanya yang statusnya 'kembali'
@@ -81,19 +80,52 @@ class AdminReturnController extends Controller
 
         $calculatedFine = $loan->calculateFine();
 
-        return view('admin.returns.denda', compact('loan', 'calculatedFine'));
+        $planned = Carbon::parse($loan->tanggal_kembali_rencana)->startOfDay();
+        $actual = Carbon::parse($loan->tanggal_kembali_aktual)->startOfDay();
+        $lateDays = $actual->gt($planned) ? $planned->diffInDays($actual) : 0;
+
+        return view('admin.returns.denda', compact('loan', 'calculatedFine', 'lateDays'));
     }
 
     public function storeFine(Request $request, $id)
     {
         $request->validate([
-            'denda' => 'required|integer|min:0',
+            'denda_per_hari' => 'required|integer|min:0',
+            'denda_tf' => 'required|string|max:255',
+            'qris_image' => 'nullable|image|max:4096',
         ]);
 
         $loan = Loan::findOrFail($id);
-        $loan->update(['denda' => $request->denda]);
 
-        ActivityLog::record('Denda Ditambahkan', 'Denda Rp ' . number_format($request->denda) . ' untuk loan ID ' . $loan->id);
+        $planned = Carbon::parse($loan->tanggal_kembali_rencana)->startOfDay();
+        $actual = Carbon::parse($loan->tanggal_kembali_aktual)->startOfDay();
+        $lateDays = $actual->gt($planned) ? $planned->diffInDays($actual) : 0;
+
+        $dendaTotal = (int) $request->denda_per_hari * (int) $lateDays;
+
+        $dataToUpdate = [
+            'denda' => $dendaTotal,
+            'denda_tf' => $request->denda_tf,
+        ];
+
+        // Wajib upload QRIS kalau denda > 0 dan belum ada QR sebelumnya
+        if ($dendaTotal > 0 && !$loan->denda_qris_image_path && !$request->hasFile('qris_image')) {
+            return back()->withErrors(['qris_image' => 'Upload QRIS wajib diisi untuk denda > 0.'])->withInput();
+        }
+
+        if ($request->hasFile('qris_image')) {
+            // Hapus file lama jika ada
+            if ($loan->denda_qris_image_path) {
+                Storage::disk('public')->delete($loan->denda_qris_image_path);
+            }
+
+            $path = $request->file('qris_image')->store('qris/denda', 'public');
+            $dataToUpdate['denda_qris_image_path'] = $path;
+        }
+
+        $loan->update($dataToUpdate);
+
+        ActivityLog::record('Denda Ditambahkan', 'Denda Rp ' . number_format($dendaTotal) . ' untuk loan ID ' . $loan->id);
 
         return redirect()->route('admin.returns.index')->with('success', 'Denda berhasil disimpan.');
     }
