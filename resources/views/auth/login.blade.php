@@ -31,6 +31,22 @@
                 <form action="{{ url('/login') }}" method="POST">
                     @csrf
 
+                    {{-- success create akun message --}}
+                    @if(session('success'))
+                        <div class="mb-4 rounded-lg border-l-4 border-green-500 bg-green-50 p-4 shadow-sm" role="alert">
+                            <div class="flex items-start">
+                                <div class="flex-shrink-0">
+                                    <svg class="h-5 w-5 text-green-500" fill="currentColor" viewBox="0 0 20 20">
+                                        <path fill-rule="evenodd" d="M10 18a8 8 0 100-16 8 8 0 000 16zm3.707-9.293a1 1 0 00-1.414-1.414L9 10.586 7.707 9.293a1 1 0 00-1.414 1.414l2 2a1 1 0 001.414 0l4-4z" clip-rule="evenodd"/>
+                                    </svg>
+                                </div>
+                                <div class="ml-3">
+                                    <p class="text-sm text-green-700">{{ session('success') }}</p>
+                                </div>
+                            </div>
+                        </div>
+                    @endif
+                    
                     <!-- error message -->
                  @if ($errors->any())
                 <div class="mb-4 rounded-lg border-l-4 border-red-500 bg-red-50 p-4 shadow-sm" role="alert">
@@ -76,17 +92,6 @@
                         </div>
                 </div>
 
-                    <div class="mb-6 flex items-center">
-                        <input
-                            id="remember"
-                            name="remember"
-                            type="checkbox"
-                            value="1"
-                            {{ old('remember') ? 'checked' : '' }}
-                            class="h-4 w-4 rounded border-gray-300 text-blue-600 focus:ring-blue-500"
-                        >
-                        <label for="remember" class="ml-2 text-sm text-gray-700">Remember me</label>
-                    </div>
 
             <script>
                 const togglePassword = document.getElementById('togglePassword');
@@ -111,6 +116,16 @@
                         Masuk
                     </button>
                 </form>
+
+                {{-- registrasi --}}
+                <div class="mt-6 text-center">
+                    <p class="text-sm text-gray-600">
+                        Tidak memiliki akun?
+                        <a href="{{ route('register') }}" class="text-blue-600 hover:text-blue-700 font-medium hover:underline">
+                            Daftar di sini
+                        </a>
+                    </p>
+                </div>
 
                 <!-- Footer -->
                 <div class="mt-6 text-center">

@@ -13,11 +13,20 @@ class ToolController extends Controller
     /**
      * Menampilkan daftar alat (Read).
      */
-    public function index()
+    public function index(Request $request)
     {
-        // Mengambil data alat, diurutkan terbaru, dengan pagination 10 per halaman
-        // 'with' digunakan untuk Eager Loading relasi kategori agar query lebih ringan
-        $tools = Tool::with('category')->latest()->paginate(10);
+        // Fitur pencarian sederhana
+        $query = Tool::with('category');
+
+        if ($request->has('search')) {
+            $query->where('nama_alat', 'like', '%' . $request->search . '%')
+                  ->orWhere('deskripsi', 'like', '%' . $request->search . '%')
+                  ->orWhereHas('category', function($q) use ($request) {
+                      $q->where('nama_kategori', 'like', '%' . $request->search . '%');
+                  });
+        }
+
+        $tools = $query->latest()->paginate(10);
 
         return view('admin.tools.index', compact('tools'));
     }

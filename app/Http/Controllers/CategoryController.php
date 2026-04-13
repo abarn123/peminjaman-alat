@@ -11,10 +11,16 @@ class CategoryController extends Controller
     /**
      * Menampilkan daftar kategori.
      */
-    public function index()
+    public function index(Request $request)
     {
-        // Ambil data kategori + hitung jumlah alat di dalamnya (tools_count)
-        $categories = Category::withCount('tools')->latest()->paginate(10);
+        // Fitur pencarian sederhana
+        $query = Category::withCount('tools');
+
+        if ($request->has('search')) {
+            $query->where('nama_kategori', 'like', '%' . $request->search . '%');
+        }
+
+        $categories = $query->latest()->paginate(10);
 
         return view('admin.categories.index', compact('categories'));
     }

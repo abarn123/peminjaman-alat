@@ -7,9 +7,29 @@
         <p class="text-gray-500 mt-1">Kelola semua transaksi peminjaman alat di laboratorium</p>
     </div>
 
-    <!-- Tombol Tambah Peminjaman -->
-    <div class="mb-6 flex justify-end">
-        <a href="{{ route('admin.loans.create') }}" class="inline-flex items-center px-4 py-2 bg-blue-600 hover:bg-blue-700 text-white text-sm font-medium rounded-lg transition duration-200 shadow-sm">
+    <!-- Tombol Tambah Peminjaman dan Search -->
+    <div class="mb-6 flex flex-col sm:flex-row justify-between items-center gap-4">
+        <div class="w-full sm:w-auto">
+            <form action="{{ route('admin.loans.index') }}" method="GET" class="flex gap-2">
+                <div class="relative flex-1">
+                    <svg class="absolute left-3 top-1/2 transform -translate-y-1/2 w-4 h-4 text-gray-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M21 21l-6-6m2-5a7 7 0 11-14 0 7 7 0 0114 0z"></path>
+                    </svg>
+                    <input type="text"
+                           name="search"
+                           class="pl-9 pr-4 py-2 w-full sm:w-80 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-blue-500 transition duration-200"
+                           placeholder="Cari Nama Peminjam, Email, Alat, atau Status..."
+                           value="{{ request('search') }}">
+                </div>
+                <button type="submit" class="inline-flex items-center px-4 py-2 bg-gray-600 hover:bg-gray-700 text-white text-sm font-medium rounded-lg transition duration-200">
+                    <svg class="w-4 h-4 mr-2" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M21 21l-6-6m2-5a7 7 0 11-14 0 7 7 0 0114 0z"></path>
+                    </svg>
+                    Cari
+                </button>
+            </form>
+        </div>
+        <a href="{{ route('admin.loans.create') }}" class="inline-flex items-center px-4 py-2 bg-blue-600 hover:bg-blue-700 text-white text-sm font-medium rounded-lg transition duration-200 shadow-sm whitespace-nowrap">
             <svg class="w-4 h-4 mr-2" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                 <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 4v16m8-8H4"></path>
             </svg>
@@ -35,6 +55,9 @@
                         <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 5H7a2 2 0 00-2 2v12a2 2 0 002 2h10a2 2 0 002-2V7a2 2 0 00-2-2h-2M9 5a2 2 0 002 2h2a2 2 0 002-2M9 5a2 2 0 012-2h2a2 2 0 012 2"></path>
                     </svg>
                     <p class="mt-2 text-sm text-gray-500">Tidak ada data peminjaman.</p>
+                    @if(request('search'))
+                        <p class="mt-1 text-xs text-gray-400">Coba dengan kata kunci yang berbeda.</p>
+                    @endif
                 </div>
             @else
                 <table class="w-full">

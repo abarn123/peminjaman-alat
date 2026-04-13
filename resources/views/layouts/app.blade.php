@@ -110,6 +110,16 @@
                                 </li>
                                 <li>
                                     <a class="flex items-center px-3 py-2 text-sm font-medium rounded-lg transition 
+                                        {{ request()->routeIs('petugas.denda.*') ? 'bg-blue-50 text-blue-700' : 'text-gray-700 hover:text-blue-600 hover:bg-gray-100' }}" 
+                                       href="{{ route('petugas.denda.index') }}">
+                                        <svg class="w-4 h-4 mr-2" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 8c-1.657 0-3 .895-3 2s1.343 2 3 2 3 .895 3 2-1.343 2-3 2m0-8c1.11 0 2.08.402 2.599 1M12 8V7m0 1v8m0 0v1m0-1c-1.11 0-2.08-.402-2.599-1M21 12a9 9 0 11-18 0 9 9 0 0118 0z"></path>
+                                        </svg>
+                                        Kelola Denda
+                                    </a>
+                                </li>
+                                <li>
+                                    <a class="flex items-center px-3 py-2 text-sm font-medium rounded-lg transition 
                                         {{ request()->is('petugas/laporan') ? 'bg-blue-50 text-blue-700' : 'text-gray-700 hover:text-blue-600 hover:bg-gray-100' }}" 
                                        href="/petugas/laporan">
                                         <svg class="w-4 h-4 mr-2" fill="none" stroke="currentColor" viewBox="0 0 24 24">
@@ -222,6 +232,7 @@
                         <a href="{{ route('admin.returns.index') }}" class="block px-3 py-2 rounded-lg text-sm {{ request()->routeIs('admin.returns.*') ? 'bg-blue-50 text-blue-700' : 'text-gray-700 hover:bg-gray-100' }}">Pengembalian</a>
                     @elseif(auth()->user()->role == 'petugas')
                         <a href="/petugas/dashboard" class="block px-3 py-2 rounded-lg text-sm {{ request()->is('petugas/dashboard') ? 'bg-blue-50 text-blue-700' : 'text-gray-700 hover:bg-gray-100' }}">Validasi Peminjaman</a>
+                        <a href="{{ route('petugas.denda.index') }}" class="block px-3 py-2 rounded-lg text-sm {{ request()->routeIs('petugas.denda.*') ? 'bg-blue-50 text-blue-700' : 'text-gray-700 hover:bg-gray-100' }}">Kelola Denda</a>
                         <a href="/petugas/laporan" class="block px-3 py-2 rounded-lg text-sm {{ request()->is('petugas/laporan') ? 'bg-blue-50 text-blue-700' : 'text-gray-700 hover:bg-gray-100' }}">Laporan</a>
                     @elseif(auth()->user()->role == 'peminjam')
                         <a href="/peminjam/dashboard" class="block px-3 py-2 rounded-lg text-sm {{ request()->is('peminjam/dashboard') ? 'bg-blue-50 text-blue-700' : 'text-gray-700 hover:bg-gray-100' }}">Daftar Alat</a>

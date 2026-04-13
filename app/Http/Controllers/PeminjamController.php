@@ -1,7 +1,6 @@
 <?php
 
 namespace App\Http\Controllers;
-
 use App\Models\ActivityLog;
 use App\Models\Loan;
 use App\Models\Tool;

@@ -10,7 +10,7 @@ use App\Http\Controllers\PeminjamController;
 use App\Http\Controllers\ToolController;
 use App\Http\Controllers\UserController;
 use App\Models\ActivityLog;
-use Illuminate\support\facades\Auth;
+use Illuminate\Support\facades\Auth;
 
 //Login dan logout (semua role)
 Route::get('/', function(){
@@ -28,7 +28,10 @@ return view ('login');
 })->name('home');
 Route::get('/login', [AuthController::class, 'showLoginForm'])->name('login');
 Route::post('/login', [AuthController::class, 'login']);
-route::post('/logout', [AuthController::class,'logout'])->name('logout');
+Route::get('/register', [AuthController::class, 'showRegisterForm'])->name('register');
+Route::post('/register', [AuthController::class, 'register']);
+Route::post('/logout', [AuthController::class,'logout'])->name('logout');
+
 
 //group admin (CRUD user, alat, kategori, log)
 Route::middleware(['auth', 'role:admin'])->group(function(){
@@ -53,10 +56,12 @@ Route::middleware(['auth', 'role:admin'])->group(function(){
 Route::middleware(['auth', 'role:petugas'])->group(function(){
     Route::get('/petugas/dashboard', [PetugasController::class, 'index']);
     Route::post('/petugas/approve/{id}', [PetugasController::class, 'approve']); // Menyetujui
-    Route::post('/petugas/reject/{id}', [petugasController::class, 'reject']); //ditolak
+    Route::post('/petugas/reject/{id}', [PetugasController::class, 'reject']); //ditolak
     Route::post('/petugas/return/{id}', [PetugasController::class, 'processReturn']); // Pengembalian
     Route::get('/petugas/laporan', [PetugasController::class, 'report']); // Cetak Laporan
-
+    Route::get('/petugas/denda', [PetugasController::class, 'dendaIndex'])->name('petugas.denda.index');
+    Route::get('/petugas/denda/{id}/formDenda', [PetugasController::class, 'showFormDenda'])->name('petugas.denda.formDenda');
+    Route::post('/petugas/denda/{id}/formDenda', [PetugasController::class, 'storeFormDenda']);
 });
 
 //group peminjam (lihat alat, ajukan pinjam)

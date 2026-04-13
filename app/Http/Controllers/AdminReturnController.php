@@ -12,12 +12,28 @@ use App\Models\ActivityLog;
 class AdminReturnController extends Controller
 {
     //menampilkan data pengembalian
-    public function index()
+    public function index(Request $request)
     {
-        // Ambil hanya yang statusnya 'kembali'
-        $returns = Loan::with(['user', 'tool', 'petugas'])
-            ->where('status', 'kembali')
-            ->latest('tanggal_kembali_aktual')
+        // ambil data yang statusnya kembali doang
+        $query = Loan::with(['user', 'tool', 'petugas'])
+            ->where('status', 'kembali');
+
+        // logika fitur search
+        if ($request->has('search') && !empty($request->search)) {
+            $search = $request->search;
+            $query->where(function($q) use ($search) {
+                $q->whereHas('user', function($userQuery) use ($search) {
+                    $userQuery->where('name', 'like', '%' . $search . '%')
+                             ->orWhere('email', 'like', '%' . $search . '%');
+                })
+                ->orWhereHas('tool', function($toolQuery) use ($search) {
+                    $toolQuery->where('nama_alat', 'like', '%' . $search . '%');
+                })
+                ->orWhere('status', 'like', '%' . $search . '%');
+            });
+        }
+
+        $returns = $query->latest('tanggal_kembali_aktual')
             ->paginate(10);
 
         return view('admin.returns.index', compact('returns'));

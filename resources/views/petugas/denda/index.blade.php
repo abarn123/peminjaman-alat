@@ -4,37 +4,29 @@
     <!-- Header -->
     <div class="mb-8">
         <h1 class="text-2xl font-bold text-gray-800">Data Pengembalian Alat</h1>
-        <p class="text-gray-500 mt-1">Kelola data pengembalian alat yang telah dipinjam</p>
+        <p class="text-gray-500 mt-1">Kelola denda untuk pengembalian alat yang terlambat</p>
     </div>
 
-    <!-- Tombol Proses Pengembalian Baru dan Search -->
-    <div class="mb-6 flex flex-col sm:flex-row justify-between items-center gap-4">
-        <div class="w-full sm:w-auto">
-            <form action="{{ route('admin.returns.index') }}" method="GET" class="flex gap-2">
-                <div class="relative flex-1">
-                    <svg class="absolute left-3 top-1/2 transform -translate-y-1/2 w-4 h-4 text-gray-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M21 21l-6-6m2-5a7 7 0 11-14 0 7 7 0 0114 0z"></path>
-                    </svg>
-                    <input type="text"
-                           name="search"
-                           class="pl-9 pr-4 py-2 w-full sm:w-80 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-blue-500 transition duration-200"
-                           placeholder="Cari Nama Peminjam, Email, Alat, atau Status..."
-                           value="{{ request('search') }}">
-                </div>
-                <button type="submit" class="inline-flex items-center px-4 py-2 bg-gray-600 hover:bg-gray-700 text-white text-sm font-medium rounded-lg transition duration-200">
-                    <svg class="w-4 h-4 mr-2" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M21 21l-6-6m2-5a7 7 0 11-14 0 7 7 0 0114 0z"></path>
-                    </svg>
-                    Cari
-                </button>
-            </form>
-        </div>
-        <a href="{{ route('admin.returns.create') }}" class="inline-flex items-center px-4 py-2 bg-green-600 hover:bg-green-700 text-white text-sm font-medium rounded-lg transition duration-200 shadow-sm whitespace-nowrap">
-            <svg class="w-4 h-4 mr-2" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 4v16m8-8H4"></path>
-            </svg>
-            Proses Pengembalian Baru
-        </a>
+    <!-- Search -->
+    <div class="mb-6">
+        <form action="{{ route('petugas.denda.index') }}" method="GET" class="flex gap-2">
+            <div class="relative flex-1">
+                <svg class="absolute left-3 top-1/2 transform -translate-y-1/2 w-4 h-4 text-gray-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M21 21l-6-6m2-5a7 7 0 11-14 0 7 7 0 0114 0z"></path>
+                </svg>
+                <input type="text"
+                       name="search"
+                       class="pl-9 pr-4 py-2 w-full sm:w-80 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-blue-500 transition duration-200"
+                       placeholder="Cari Nama Peminjam, Email, Alat, atau Status..."
+                       value="{{ request('search') }}">
+                            <button type="submit" class="inline-flex items-center px-4 py-2 bg-gray-600 hover:bg-gray-700 text-white text-sm font-medium rounded-lg transition duration-200">
+                                <svg class="w-4 h-4 mr-2" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M21 21l-6-6m2-5a7 7 0 11-14 0 7 7 0 0114 0z"></path>
+                                </svg>
+                                Cari
+                            </button>       
+            </div>
+        </form>
     </div>
 
     <!-- Tabel Pengembalian -->
@@ -74,6 +66,12 @@
                     </thead>
                     <tbody class="divide-y divide-gray-100">
                         @forelse($returns as $key => $r)
+                            @php
+                                $rencana = strtotime($r->tanggal_kembali_rencana);
+                                $aktual = strtotime($r->tanggal_kembali_aktual);
+                                $isLate = $aktual > $rencana;
+                                $daysLate = $isLate ? ceil(($aktual - $rencana) / (60 * 60 * 24)) : 0;
+                            @endphp
                             <tr class="hover:bg-gray-50 transition">
                                 <td class="px-6 py-3 text-sm text-gray-500">
                                     {{ ($returns->currentPage() - 1) * $returns->perPage() + $key + 1 }}
@@ -105,7 +103,7 @@
                                         <svg class="w-3 h-3 text-green-500" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                                             <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M8 7V3m8 4V3m-9 8h10M5 21h14a2 2 0 002-2V7a2 2 0 00-2-2H5a2 2 0 00-2 2v12a2 2 0 002 2z"></path>
                                         </svg>
-                                        {{ $r->tanggal_pinjam }}
+                                        {{ \Carbon\Carbon::parse($r->tanggal_pinjam)->format('d/m/Y') }}
                                     </div>
                                 </td>
                                 <td class="px-6 py-3">
@@ -114,14 +112,14 @@
                                             <svg class="w-3 h-3 text-blue-500" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                                                 <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 8v4l3 3m6-3a9 9 0 11-18 0 9 9 0 0118 0z"></path>
                                             </svg>
-                                            <span class="text-sm text-gray-700">{{ $r->tanggal_kembali_aktual }}</span>
+                                            <span class="text-sm text-gray-700">{{ \Carbon\Carbon::parse($r->tanggal_kembali_aktual)->format('d/m/Y') }}</span>
                                         </div>
-                                        @if($r->tanggal_kembali_aktual > $r->tanggal_kembali_rencana)
+                                        @if($isLate)
                                             <span class="inline-flex items-center px-2 py-0.5 rounded-full text-xs font-medium bg-red-100 text-red-800">
                                                 <svg class="w-3 h-3 mr-1" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                                                     <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 8v4l3 3m6-3a9 9 0 11-18 0 9 9 0 0118 0z"></path>
                                                 </svg>
-                                                Telat
+                                                Telat {{ $daysLate }} hari
                                             </span>
                                         @else
                                             <span class="inline-flex items-center px-2 py-0.5 rounded-full text-xs font-medium bg-green-100 text-green-800">
@@ -145,30 +143,16 @@
                                 </td>
                                 <td class="px-6 py-3">
                                     <div class="flex items-center gap-2">
-                                        {{-- @if($r->tanggal_kembali_aktual > $r->tanggal_kembali_rencana)
-                                            <a href="{{ route('admin.returns.denda', $r->id) }}" class="inline-flex items-center px-3 py-1.5 bg-orange-500 hover:bg-orange-600 text-white text-xs font-medium rounded-lg transition duration-200">
+                                        @if($isLate)
+                                            <a href="{{ route('petugas.denda.formDenda', $r->id) }}" class="inline-flex items-center px-3 py-1.5 bg-orange-500 hover:bg-orange-600 text-white text-xs font-medium rounded-lg transition duration-200">
                                                 <svg class="w-3 h-3 mr-1" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                                                     <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 8c-1.657 0-3 .895-3 2s1.343 2 3 2 3 .895 3 2-1.343 2-3 2m0-8c1.11 0 2.08.402 2.599 1M12 8V7m0 1v8m0 0v1m0-1c-1.11 0-2.08-.402-2.599-1M21 12a9 9 0 11-18 0 9 9 0 0118 0z"></path>
                                                 </svg>
                                                 Denda
                                             </a>
-                                        @endif --}}
-                                        <a href="{{ route('admin.returns.edit', $r->id) }}" class="inline-flex items-center px-3 py-1.5 bg-yellow-500 hover:bg-yellow-600 text-white text-xs font-medium rounded-lg transition duration-200">
-                                            <svg class="w-3 h-3 mr-1" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M11 5H6a2 2 0 00-2 2v11a2 2 0 002 2h11a2 2 0 002-2v-5m-1.414-9.414a2 2 0 112.828 2.828L11.828 15H9v-2.828l8.586-8.586z"></path>
-                                            </svg>
-                                            Edit
-                                        </a>
-                                        <form action="{{ route('admin.returns.destroy', $r->id) }}" method="POST" class="inline" onsubmit="return confirm('Yakin ingin menghapus riwayat pengembalian ini?');">
-                                            @csrf
-                                            @method('DELETE')
-                                            <button type="submit" class="inline-flex items-center px-3 py-1.5 bg-red-500 hover:bg-red-600 text-white text-xs font-medium rounded-lg transition duration-200">
-                                                <svg class="w-3 h-3 mr-1" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                                                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 7l-.867 12.142A2 2 0 0116.138 21H7.862a2 2 0 01-1.995-1.858L5 7m5 4v6m4-6v6m1-10V4a1 1 0 00-1-1h-4a1 1 0 00-1 1v3M4 7h16"></path>
-                                                </svg>
-                                                Hapus
-                                            </button>
-                                        </form>
+                                        @else
+                                            <span class="text-gray-400">-</span>
+                                        @endif
                                     </div>
                                 </td>
                             </tr>

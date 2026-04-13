@@ -5,16 +5,30 @@ namespace App\Http\Controllers;
 use App\Models\Loan;
 use App\Models\User;
 use App\Models\Tool;
-use App\Models\ActivityLog; // Pastikan model ini ada
+use App\Models\ActivityLog;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Auth;
 
 class AdminLoanController extends Controller
 {
     // READ: Tampilkan semua data
-    public function index()
+    public function index(Request $request)
     {
-        $loans = Loan::with(['user', 'tool'])->latest()->paginate(10);
+        // Fitur pencarian
+        $query = Loan::with(['user', 'tool']);
+
+        if ($request->has('search')) {
+            $query->where('status', 'like', '%' . $request->search . '%')
+                  ->orWhereHas('user', function($q) use ($request) {
+                      $q->where('name', 'like', '%' . $request->search . '%')
+                        ->orWhere('email', 'like', '%' . $request->search . '%');
+                  })
+                  ->orWhereHas('tool', function($q) use ($request) {
+                      $q->where('nama_alat', 'like', '%' . $request->search . '%');
+                  });
+        }
+
+        $loans = $query->latest()->paginate(10);
 
         return view('admin.loans.index', compact('loans'));
     }
@@ -22,7 +36,7 @@ class AdminLoanController extends Controller
     // CREATE: Form tambah
     public function create()
     {
-        // Ambil user yang rolenya peminjam saja
+        // Ambil user yang rolenya peminjam doang
         $users = User::where('role', 'peminjam')->get();
         // Ambil semua alat
         $tools = Tool::all();
@@ -54,7 +68,7 @@ class AdminLoanController extends Controller
             'tanggal_pinjam'          => $request->tanggal_pinjam,
             'tanggal_kembali_rencana' => $request->tanggal_kembali_rencana,
             'status'                  => $request->status,
-            'petugas_id'              => Auth::id() // Admin yang input dianggap petugas
+            'petugas_id'              => Auth::id()
         ]);
 
         // Kurangi stok jika admin langsung set 'disetujui'

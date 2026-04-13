@@ -67,6 +67,14 @@
                     </thead>
                     <tbody class="divide-y divide-gray-100">
                         @forelse($activeLoans as $loan)
+                            @php
+                                $today = strtotime(date('Y-m-d'));
+                                $rencana = strtotime($loan->tanggal_kembali_rencana);
+                                $daysDiff = ceil(($rencana - $today) / (60 * 60 * 24));
+                                $isOverdue = $today > $rencana;
+                                $daysLate = $isOverdue ? abs($daysDiff) : 0;
+                                $daysLeft = !$isOverdue ? $daysDiff : 0;
+                            @endphp
                             <tr class="hover:bg-gray-50 transition">
                                 <td class="px-6 py-3">
                                     <div class="flex items-center gap-3">
@@ -95,7 +103,7 @@
                                         <svg class="w-3 h-3 text-green-500" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                                             <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M8 7V3m8 4V3m-9 8h10M5 21h14a2 2 0 002-2V7a2 2 0 00-2-2H5a2 2 0 00-2 2v12a2 2 0 002 2z"></path>
                                         </svg>
-                                        <span class="text-sm text-gray-700">{{ $loan->tanggal_pinjam }}</span>
+                                        <span class="text-sm text-gray-700">{{ \Carbon\Carbon::parse($loan->tanggal_pinjam)->format('d/m/Y') }}</span>
                                     </div>
                                 </td>
                                 <td class="px-6 py-3">
@@ -104,24 +112,34 @@
                                             <svg class="w-3 h-3 text-red-500" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                                                 <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 8v4l3 3m6-3a9 9 0 11-18 0 9 9 0 0118 0z"></path>
                                             </svg>
-                                            <span class="text-sm text-gray-700">{{ $loan->tanggal_kembali_rencana }}</span>
+                                            <span class="text-sm text-gray-700">{{ \Carbon\Carbon::parse($loan->tanggal_kembali_rencana)->format('d/m/Y') }}</span>
                                         </div>
-                                        @if(now() > $loan->tanggal_kembali_rencana)
+                                        @if($isOverdue)
                                             <span class="inline-flex items-center px-2 py-0.5 rounded-full text-xs font-medium bg-red-100 text-red-800">
                                                 <svg class="w-3 h-3 mr-1" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                                                     <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 9v2m0 4h.01m-6.938 4h13.856c1.54 0 2.502-1.667 1.732-3L13.732 4c-.77-1.333-2.694-1.333-3.464 0L3.34 16c-.77 1.333.192 3 1.732 3z"></path>
                                                 </svg>
-                                                Lewat Jatuh Tempo
+                                                Terlambat {{ $daysLate }} hari
+                                            </span>
+                                        @else
+                                            <span class="inline-flex items-center px-2 py-0.5 rounded-full text-xs font-medium bg-green-100 text-green-800">
+                                                <svg class="w-3 h-3 mr-1" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M5 13l4 4L19 7"></path>
+                                                </svg>
+                                                Sisa {{ $daysLeft }} hari
                                             </span>
                                         @endif
                                     </div>
                                 </td>
                                 <td class="px-6 py-3">
-                                    <span class="inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-medium bg-blue-100 text-blue-800">
+                                    <span class="inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-medium {{ $isOverdue ? 'bg-red-100 text-red-800' : 'bg-blue-100 text-blue-800' }}">
                                         <svg class="w-3 h-3 mr-1" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                                             <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 12l2 2 4-4m5.618-4.016A11.955 11.955 0 0112 2.944a11.955 11.955 0 01-8.618 3.04A12.02 12.02 0 003 9c0 5.591 3.824 10.29 9 11.622 5.176-1.332 9-6.03 9-11.622 0-1.042-.133-2.052-.382-3.016z"></path>
                                         </svg>
                                         Sedang Dipinjam
+                                        @if($isOverdue)
+                                            <span class="ml-1 font-normal">(Telat)</span>
+                                        @endif
                                     </span>
                                 </td>
                                 <td class="px-6 py-3">
