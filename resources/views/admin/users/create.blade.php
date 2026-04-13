@@ -74,8 +74,7 @@
                                 required>
                             <option value="">-- Pilih Role --</option>
                             <option value="peminjam" {{ old('role') == 'peminjam' ? 'selected' : '' }}>📋 Peminjam</option>
-                            <option value="petugas" {{ old('role') == 'petugas' ? 'selected' : '' }}>🔧 Petugas Lab</option>
-                            <option value="admin" {{ old('role') == 'admin' ? 'selected' : '' }}>🛡️ Administrator</option>
+                            <option value="petugas" {{ old('role') == 'petugas' ? 'selected' : '' }}>🔧 Petugas</option>
                         </select>
                         @error('role')
                             <p class="mt-1 text-sm text-red-600">{{ $message }}</p>

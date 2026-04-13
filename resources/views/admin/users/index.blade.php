@@ -134,7 +134,9 @@
                     </tbody>
                 </table>
             @endif
+
         </div>
+
 
         <!-- Pagination -->
         @if($users->hasPages())
@@ -152,4 +154,18 @@
             </div>
         @endif
     </div>
+
+
+            <div class="flex-1">
+                <div class="mt-3 p-3 bg-red-100 rounded-lg">
+                    <p class="text-xs text-red-800 font-medium mb-2">Catatan:</p>
+                    <ul class="text-xs text-red-700 space-y-1">
+                        <li>• untuk menghapus data user, hapus terlebih dahulu data peminjaman user yang akan dihapus.</li>
+                    </ul>
+                </div>
+            </div>
+        </div>
+    </div>
+
+
 @endsection

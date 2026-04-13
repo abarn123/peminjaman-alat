@@ -68,7 +68,6 @@
                                 required>
                             <option value="peminjam" {{ $user->role == 'peminjam' ? 'selected' : '' }}>📋 Peminjam</option>
                             <option value="petugas" {{ $user->role == 'petugas' ? 'selected' : '' }}>🔧 Petugas</option>
-                            <option value="admin" {{ $user->role == 'admin' ? 'selected' : '' }}>🛡️ Administrator</option>
                         </select>
                         <p class="mt-1 text-xs text-gray-500">Role menentukan akses dan fitur yang tersedia untuk pengguna.</p>
                     </div>
