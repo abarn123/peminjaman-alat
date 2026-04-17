@@ -84,7 +84,6 @@ class AuthController extends Controller
          */
         public function register(Request $request)
             {
-                // Validasi input: nama, email unik, password minimal 6 karakter dan confirmed
                 $request->validate([
                     'name' => 'required|string|max:255',
                     'email' => 'required|email|unique:users,email',

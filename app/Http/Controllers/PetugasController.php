@@ -157,7 +157,6 @@ class PetugasController extends Controller
     {
         $request->validate([
             'denda_per_hari' => 'required|integer|min:0',
-            'denda_tf' => 'required|string|max:255',
         ]);
 
         $loan = Loan::findOrFail($id);
@@ -170,7 +169,6 @@ class PetugasController extends Controller
 
         $loan->update([
             'denda' => $dendaTotal,
-            'denda_tf' => $request->denda_tf,
         ]);
 
         ActivityLog::record('Denda Ditambahkan (Petugas)', 'Denda Rp ' . number_format($dendaTotal) . ' untuk loan ID ' . $loan->id);

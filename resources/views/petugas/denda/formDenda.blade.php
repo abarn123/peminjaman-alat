@@ -145,23 +145,6 @@
                     </div>
                 </div>
 
-                <!-- TF Kemana -->
-                <div class="mb-6">
-                    <label class="block text-sm font-medium text-gray-700 mb-2">Transfer Ke <span class="text-red-500">*</span></label>
-                    <div class="relative">
-                        <svg class="absolute left-3 top-1/2 transform -translate-y-1/2 w-4 h-4 text-gray-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M3 10h18M7 15h1m4 0h1m-7 4h12a3 3 0 003-3V8a3 3 0 00-3-3H6a3 3 0 00-3 3v8a3 3 0 003 3z"></path>
-                        </svg>
-                        <input type="text"
-                               name="denda_tf"
-                               class="w-full pl-10 pr-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-blue-500 transition duration-200"
-                               placeholder="Contoh: BCA 1234567890 a.n Lab Komputer"
-                               value="{{ old('denda_tf', $loan->denda_tf) }}"
-                               required>
-                    </div>
-                    <p class="mt-1 text-xs text-gray-500">Informasi rekening/tujuan pembayaran yang akan ditampilkan ke peminjam.</p>
-                </div>
-
                 <!-- Tombol Aksi -->
                 <div class="flex justify-between items-center pt-4 border-t border-gray-100">
                     <a href="{{ route('petugas.denda.index') }}" class="inline-flex items-center px-4 py-2 bg-gray-200 hover:bg-gray-300 text-gray-700 text-sm font-medium rounded-lg transition duration-200">
@@ -177,6 +160,7 @@
                         Simpan Denda
                     </button>
                 </div>
+                
             </form>
         </div>
     </div>
