@@ -71,6 +71,33 @@ class PetugasController extends Controller
         return back()->with('success', 'Alat telah dikembalikan.');
     }
 
+    public function uploadReturnProof(Request $request, $id)
+    {
+        $loan = Loan::findOrFail($id);
+
+        if ($loan->status !== 'kembali') {
+            return back()->with('error', 'Hanya peminjaman yang sudah dikembalikan yang dapat mengunggah bukti foto.');
+        }
+
+        $request->validate([
+            'return_proof_image' => 'required|image|mimes:jpeg,png,jpg|max:5120',
+        ]);
+
+        if ($loan->return_proof_image_path) {
+            \Illuminate\Support\Facades\Storage::disk('public')->delete($loan->return_proof_image_path);
+        }
+
+        $path = $request->file('return_proof_image')->store('return-proof', 'public');
+
+        $loan->update([
+            'return_proof_image_path' => $path,
+        ]);
+
+        ActivityLog::record('Upload Bukti Pengembalian', 'Petugas mengunggah bukti pengembalian untuk loan ID ' . $loan->id);
+
+        return back()->with('success', 'Bukti pengembalian berhasil diunggah.');
+    }
+
     public function report(Request $request)
     {
         // Bisa tambahkan filter tanggal jika mau
@@ -83,7 +110,7 @@ class PetugasController extends Controller
     public function dendaIndex(Request $request)
     {
         // Ambil hanya yang statusnya 'kembali'
-        $query = Loan::with(['user', 'tool', 'petugas'])
+        $query = Loan::with(['user', 'tool.category', 'petugas'])
             ->where('status', 'kembali');
 
         //search functionality
@@ -113,7 +140,7 @@ class PetugasController extends Controller
         $loan = Loan::with(['user', 'tool'])->findOrFail($id);
 
         if (!$loan->terlambat && !$loan->isLate()) {
-            return redirect()->route('petugas.denda.index')->with('error', 'Loan tidak terlambat.');
+            return redirect()->route('petugas.denda.index')->with('error', 'Pengembalian tidak terlambat.');
         }
 
         $calculatedFine = $loan->calculateFine();
@@ -131,7 +158,6 @@ class PetugasController extends Controller
         $request->validate([
             'denda_per_hari' => 'required|integer|min:0',
             'denda_tf' => 'required|string|max:255',
-            'qris_image' => 'nullable|image|max:4096',
         ]);
 
         $loan = Loan::findOrFail($id);
@@ -142,30 +168,32 @@ class PetugasController extends Controller
 
         $dendaTotal = (int) $request->denda_per_hari * (int) $lateDays;
 
-        $dataToUpdate = [
+        $loan->update([
             'denda' => $dendaTotal,
             'denda_tf' => $request->denda_tf,
-        ];
-
-        // Wajib upload QRIS kalau denda > 0 dan belum ada QR sebelumnya
-        if ($dendaTotal > 0 && !$loan->denda_qris_image_path && !$request->hasFile('qris_image')) {
-            return back()->withErrors(['qris_image' => 'Upload QRIS wajib diisi untuk denda > 0.'])->withInput();
-        }
-
-        if ($request->hasFile('qris_image')) {
-            // Hapus file lama jika ada
-            if ($loan->denda_qris_image_path) {
-                \Illuminate\Support\Facades\Storage::disk('public')->delete($loan->denda_qris_image_path);
-            }
-
-            $path = $request->file('qris_image')->store('qris/denda', 'public');
-            $dataToUpdate['denda_qris_image_path'] = $path;
-        }
-
-        $loan->update($dataToUpdate);
+        ]);
 
         ActivityLog::record('Denda Ditambahkan (Petugas)', 'Denda Rp ' . number_format($dendaTotal) . ' untuk loan ID ' . $loan->id);
 
         return redirect()->route('petugas.denda.index')->with('success', 'Denda berhasil disimpan.');
+    }
+
+    public function generateMidtransLink($id)
+    {
+        $loan = Loan::findOrFail($id);
+
+        if ($loan->denda <= 0) {
+            return back()->with('error', 'Tidak ada denda untuk loan ini.');
+        }
+
+        $snapToken = $loan->createMidtransTransaction();
+
+        return back()->with('success', 'Link pembayaran Midtrans berhasil dibuat. Peminjam dapat membayar melalui riwayat mereka.');
+    }
+
+    public function showBukti($id)
+    {
+        $loan = Loan::findOrFail($id);
+        return view('petugas.denda.bukti', compact('loan'));
     }
 }

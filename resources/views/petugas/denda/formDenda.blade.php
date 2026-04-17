@@ -162,31 +162,6 @@
                     <p class="mt-1 text-xs text-gray-500">Informasi rekening/tujuan pembayaran yang akan ditampilkan ke peminjam.</p>
                 </div>
 
-                <!-- Upload QRIS -->
-                <div class="mb-6">
-                    <label class="block text-sm font-medium text-gray-700 mb-2">Upload QRIS <span class="text-gray-400 text-xs">(Opsional)</span></label>
-                    <div class="relative">
-                        <input type="file"
-                               name="qris_image"
-                               class="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-blue-500 transition duration-200 file:mr-3 file:py-1.5 file:px-3 file:rounded-lg file:border-0 file:text-sm file:font-medium file:bg-blue-50 file:text-blue-700 hover:file:bg-blue-100"
-                               accept="image/*">
-                    </div>
-                    <p class="mt-1 text-xs text-gray-500">Upload gambar QRIS yang nominalnya sudah sesuai dengan denda.</p>
-
-                    @if($loan->denda_qris_image_path)
-                        <div class="mt-4 p-4 bg-gray-50 rounded-lg border border-gray-200">
-                            <p class="text-sm font-medium text-gray-700 mb-3">QRIS Saat Ini</p>
-                            <div class="flex items-center gap-4">
-                                <img src="{{ asset('storage/' . $loan->denda_qris_image_path) }}" alt="QRIS Denda" class="w-32 h-32 object-cover rounded-lg border border-gray-200 shadow-sm">
-                                <div class="text-xs text-gray-500">
-                                    <p>File: {{ basename($loan->denda_qris_image_path) }}</p>
-                                    <p class="mt-1">Upload file baru jika ingin mengganti QRIS.</p>
-                                </div>
-                            </div>
-                        </div>
-                    @endif
-                </div>
-
                 <!-- Tombol Aksi -->
                 <div class="flex justify-between items-center pt-4 border-t border-gray-100">
                     <a href="{{ route('petugas.denda.index') }}" class="inline-flex items-center px-4 py-2 bg-gray-200 hover:bg-gray-300 text-gray-700 text-sm font-medium rounded-lg transition duration-200">

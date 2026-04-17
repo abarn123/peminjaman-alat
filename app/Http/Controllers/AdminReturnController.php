@@ -65,7 +65,9 @@ class AdminReturnController extends Controller
     }
 
     $returnedAt = now();
-    $isLate = $returnedAt->gt(Carbon::parse($loan->tanggal_kembali_rencana));
+    $isLate = $returnedAt->startOfDay()->gt(
+        Carbon::parse($loan->tanggal_kembali_rencana)->startOfDay()
+    );
 
     $loan->tanggal_kembali_aktual = $returnedAt;
     $denda = $isLate ? $loan->calculateFine() : 0;
@@ -91,7 +93,7 @@ class AdminReturnController extends Controller
         $loan = Loan::with(['user', 'tool'])->findOrFail($id);
 
         if (!$loan->terlambat && !$loan->isLate()) {
-            return redirect()->route('admin.returns.index')->with('error', 'Loan tidak terlambat.');
+            return redirect()->route('admin.returns.index')->with('error', 'Pengembalian tidak terlambat.');
         }
 
         $calculatedFine = $loan->calculateFine();
@@ -108,7 +110,6 @@ class AdminReturnController extends Controller
         $request->validate([
             'denda_per_hari' => 'required|integer|min:0',
             'denda_tf' => 'required|string|max:255',
-            'qris_image' => 'nullable|image|max:4096',
         ]);
 
         $loan = Loan::findOrFail($id);
@@ -119,27 +120,10 @@ class AdminReturnController extends Controller
 
         $dendaTotal = (int) $request->denda_per_hari * (int) $lateDays;
 
-        $dataToUpdate = [
+        $loan->update([
             'denda' => $dendaTotal,
             'denda_tf' => $request->denda_tf,
-        ];
-
-        // Wajib upload QRIS kalau denda > 0 dan belum ada QR sebelumnya
-        if ($dendaTotal > 0 && !$loan->denda_qris_image_path && !$request->hasFile('qris_image')) {
-            return back()->withErrors(['qris_image' => 'Upload QRIS wajib diisi untuk denda > 0.'])->withInput();
-        }
-
-        if ($request->hasFile('qris_image')) {
-            // Hapus file lama jika ada
-            if ($loan->denda_qris_image_path) {
-                Storage::disk('public')->delete($loan->denda_qris_image_path);
-            }
-
-            $path = $request->file('qris_image')->store('qris/denda', 'public');
-            $dataToUpdate['denda_qris_image_path'] = $path;
-        }
-
-        $loan->update($dataToUpdate);
+        ]);
 
         ActivityLog::record('Denda Ditambahkan', 'Denda Rp ' . number_format($dendaTotal) . ' untuk loan ID ' . $loan->id);
 

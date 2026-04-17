@@ -28,10 +28,11 @@ Untuk Admin
 - Pantau Semua Aktivitas: Lihat semua peminjaman dan pengembalian
 - Log Aktivitas: Catat semua aktivitas sistem
 
-Antarmuka Sistem
+
+
+# Antarmuka Sistem
 
 Dashboard Peminjam
-
 - Daftar alat yang tersedia
 - Ajukan peminjaman alat camping
 - Status peminjaman aktif
@@ -39,7 +40,6 @@ Dashboard Peminjam
 - Notifikasi denda keterlambatan
 
 Dashboard Petugas
-
 - Validasi permintaan peminjaman alat camping
 - Proses persetujuan atau penolakan peminjaman
 - Pantau alat camping yang sedang dipinjam
@@ -48,7 +48,6 @@ Dashboard Petugas
 - Buat laporan aktivitas peminjaman
 
 Dashboard Admin
-
 - Statistik keseluruhan sistem peminjaman alat camping
 - Kelola data pengguna (tambah, edit, hapus)
 - Kelola data alat camping (tambah, edit, hapus)
@@ -57,23 +56,22 @@ Dashboard Admin
 - Pantau semua transaksi pengembalian
 - Lihat log aktivitas sistem
 
-Cara Menggunakan Sistem
+
+
+# Cara Menggunakan Sistem
 
 Login ke Sistem
-
 - Buka browser dan kunjungi alamat website
 - Klik tombol Login
 - Masukkan email dan password Anda
 
 Untuk Peminjam Baru
-
 Jika belum punya akun:
 - Klik Daftar di sini di halaman login
 - Isi formulir pendaftaran
 - Login dengan akun baru Anda
 
 Memilih dan Meminjam Alat
-
 - Login sebagai peminjam
 - Klik menu Daftar Alat
 - Pilih alat camping yang ingin dipinjam (tenda, sleeping bag, kompor, dll)
@@ -81,22 +79,19 @@ Memilih dan Meminjam Alat
 - Tunggu persetujuan dari petugas
 
 Proses Persetujuan (Petugas)
-
 - Login sebagai petugas
 - Klik menu Validasi Peminjaman
 - Lihat daftar permintaan yang menunggu
 - Klik Setujui atau Tolak sesuai kebijakan
 
 Pengembalian Alat Camping
-
 - Kembalikan alat camping ke petugas
 - Petugas catat pengembalian di sistem
 - Jika terlambat, petugas bisa tetapkan denda
-- Peminjam akan lihat informasi denda di dashboard
+- Peminjam akan lihat informasi denda di Riwayat
 
 Teknologi yang Digunakan
-
-- Backend: Laravel (PHP Framework)
+- Backend: Laravel versi 12.0 (PHP Framework)
 - Database: MySQL
 - Frontend: HTML, CSS, JavaScript, Tailwind CSS
 - Authentication: Laravel Built-in Auth

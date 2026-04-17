@@ -6,6 +6,8 @@ use App\Models\Loan;
 use App\Models\Tool;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Auth;
+use Illuminate\Support\Facades\Storage;
+use Illuminate\Support\Carbon;
 
 class PeminjamController extends Controller
 {
@@ -53,4 +55,59 @@ class PeminjamController extends Controller
 
         return view('peminjam.riwayat', compact('loans'));
     }
+
+    public function returnLoan($id)
+    {
+        // Cari loan berdasarkan ID dan pastikan milik user yang login
+        $loan = Loan::where('id', $id)
+            ->where('user_id', Auth::id())
+            ->firstOrFail();
+
+        // Pastikan status masih 'disetujui' (sedang dipinjam)
+        if ($loan->status !== 'disetujui') {
+            return back()->with('error', 'Peminjaman ini tidak dapat dikembalikan.');
+        }
+
+        // Set tanggal kembali aktual ke hari ini
+        $returnedAt = now();
+
+        // Cek apakah terlambat berdasarkan tanggal (tidak termasuk jam)
+        $isLate = $returnedAt->startOfDay()->gt(
+            Carbon::parse($loan->tanggal_kembali_rencana)->startOfDay()
+        );
+
+        // Hitung denda jika terlambat
+        $denda = $isLate ? $loan->calculateFine() : 0;
+
+        // Update loan
+        $loan->update([
+            'status'                 => 'kembali',
+            'tanggal_kembali_aktual' => $returnedAt,
+            'terlambat'              => $isLate,
+            'denda'                  => $denda,
+        ]);
+
+        // Kembalikan stok alat
+        $tool = Tool::findOrFail($loan->tool_id);
+        $tool->increment('stok');
+
+        // Catat log aktivitas
+        ActivityLog::record('Pengembalian (Peminjam)', 'Peminjam mengembalikan alat: ' . $tool->nama_alat);
+
+        return back()->with('success', 'Alat berhasil dikembalikan. Terima kasih!');
+    }
+
+    //fungsi upload bukti
+    public function payDenda($id)
+{
+    $loan = Loan::findOrFail($id);
+
+    if ($loan->denda <= 0 || $loan->midtrans_status === 'settlement') {
+        return redirect('/peminjam/riwayat')->with('error', 'Denda sudah dibayar atau tidak ada.');
+    }
+
+    $snapToken = $loan->createMidtransTransaction();
+
+    return view('peminjam.payDenda', compact('loan', 'snapToken'));
+}
 }

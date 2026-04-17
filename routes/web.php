@@ -9,8 +9,10 @@ use App\Http\Controllers\PetugasController;
 use App\Http\Controllers\PeminjamController;
 use App\Http\Controllers\ToolController;
 use App\Http\Controllers\UserController;
+use App\Http\Controllers\MidtransController;
 use App\Models\ActivityLog;
 use Illuminate\Support\facades\Auth;
+
 
 //Login dan logout (semua role)
 Route::get('/', function(){
@@ -58,10 +60,13 @@ Route::middleware(['auth', 'role:petugas'])->group(function(){
     Route::post('/petugas/approve/{id}', [PetugasController::class, 'approve']); // Menyetujui
     Route::post('/petugas/reject/{id}', [PetugasController::class, 'reject']); //ditolak
     Route::post('/petugas/return/{id}', [PetugasController::class, 'processReturn']); // Pengembalian
+    Route::post('/petugas/return-proof/{id}', [PetugasController::class, 'uploadReturnProof']); // Upload bukti foto pengembalian
     Route::get('/petugas/laporan', [PetugasController::class, 'report']); // Cetak Laporan
     Route::get('/petugas/denda', [PetugasController::class, 'dendaIndex'])->name('petugas.denda.index');
     Route::get('/petugas/denda/{id}/formDenda', [PetugasController::class, 'showFormDenda'])->name('petugas.denda.formDenda');
     Route::post('/petugas/denda/{id}/formDenda', [PetugasController::class, 'storeFormDenda']);
+    Route::post('/petugas/denda/{id}/generate-link', [PetugasController::class, 'generateMidtransLink'])->name('petugas.denda.generateLink');
+    Route::get('/petugas/denda/{id}/bukti', [PetugasController::class, 'showBukti'])->name('petugas.denda.showBukti');
 });
 
 //group peminjam (lihat alat, ajukan pinjam)
@@ -69,5 +74,9 @@ Route::middleware(['auth', 'role:peminjam'])->group(function () {
     Route::get('/peminjam/dashboard', [PeminjamController::class, 'index']); // Daftar Alat
     Route::post('/peminjam/ajukan', [PeminjamController::class, 'store']); // Mengajukan
     Route::get('/peminjam/riwayat', [PeminjamController::class, 'history']); // Riwayat & Kembalikan
+    Route::post('/peminjam/return/{id}', [PeminjamController::class, 'returnLoan'])->name('peminjam.return'); // Pengembalian
+    Route::get('/peminjam/pay-denda/{id}', [PeminjamController::class, 'payDenda'])->name('peminjam.payDenda');
 });
-
+Route::post('/midtrans/callback', [MidtransController::class, 'callback']);
+Route::post('/midtrans/client-notify', [MidtransController::class, 'clientNotify']);
+Route::post('/midtrans/test-callback/{orderId}/{status}', [MidtransController::class, 'testCallback']);

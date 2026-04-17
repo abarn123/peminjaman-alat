@@ -114,73 +114,12 @@
                         </div>
                     </div>
 
-                    <!-- Status -->
+                    <input type="hidden" name="status" value="{{ $loan->status }}">
+
                     <div class="mb-6">
-                        <label class="block text-sm font-medium text-gray-700 mb-2">Status <span class="text-red-500">*</span></label>
-                        <div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-3">
-                            <label class="relative flex items-center justify-between p-3 border border-gray-200 rounded-lg cursor-pointer hover:bg-gray-50 transition has-[:checked]:border-blue-500 has-[:checked]:bg-blue-50">
-                                <div class="flex items-center gap-2">
-                                    <div class="w-8 h-8 bg-yellow-100 rounded-full flex items-center justify-center">
-                                        <svg class="w-4 h-4 text-yellow-600" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 8v4l3 3m6-3a9 9 0 11-18 0 9 9 0 0118 0z"></path>
-                                        </svg>
-                                    </div>
-                                    <p class="text-sm font-medium text-gray-800">Pending</p>
-                                </div>
-                                <input type="radio" name="status" value="pending" class="hidden" {{ $loan->status == 'pending' ? 'checked' : '' }}>
-                                <div class="w-4 h-4 border-2 border-gray-300 rounded-full radio-check"></div>
-                            </label>
-
-                            <label class="relative flex items-center justify-between p-3 border border-gray-200 rounded-lg cursor-pointer hover:bg-gray-50 transition has-[:checked]:border-blue-500 has-[:checked]:bg-blue-50">
-                                <div class="flex items-center gap-2">
-                                    <div class="w-8 h-8 bg-blue-100 rounded-full flex items-center justify-center">
-                                        <svg class="w-4 h-4 text-blue-600" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 12l2 2 4-4m5.618-4.016A11.955 11.955 0 0112 2.944a11.955 11.955 0 01-8.618 3.04A12.02 12.02 0 003 9c0 5.591 3.824 10.29 9 11.622 5.176-1.332 9-6.03 9-11.622 0-1.042-.133-2.052-.382-3.016z"></path>
-                                        </svg>
-                                    </div>
-                                    <p class="text-sm font-medium text-gray-800">Disetujui</p>
-                                </div>
-                                <input type="radio" name="status" value="disetujui" class="hidden" {{ $loan->status == 'disetujui' ? 'checked' : '' }}>
-                                <div class="w-4 h-4 border-2 border-gray-300 rounded-full radio-check"></div>
-                            </label>
-
-                            <label class="relative flex items-center justify-between p-3 border border-gray-200 rounded-lg cursor-pointer hover:bg-gray-50 transition has-[:checked]:border-blue-500 has-[:checked]:bg-blue-50">
-                                <div class="flex items-center gap-2">
-                                    <div class="w-8 h-8 bg-green-100 rounded-full flex items-center justify-center">
-                                        <svg class="w-4 h-4 text-green-600" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M5 13l4 4L19 7"></path>
-                                        </svg>
-                                    </div>
-                                    <p class="text-sm font-medium text-gray-800">Kembali</p>
-                                </div>
-                                <input type="radio" name="status" value="kembali" class="hidden" {{ $loan->status == 'kembali' ? 'checked' : '' }}>
-                                <div class="w-4 h-4 border-2 border-gray-300 rounded-full radio-check"></div>
-                            </label>
-
-                            <label class="relative flex items-center justify-between p-3 border border-gray-200 rounded-lg cursor-pointer hover:bg-gray-50 transition has-[:checked]:border-red-500 has-[:checked]:bg-red-50">
-                                <div class="flex items-center gap-2">
-                                    <div class="w-8 h-8 bg-red-100 rounded-full flex items-center justify-center">
-                                        <svg class="w-4 h-4 text-red-600" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12"></path>
-                                        </svg>
-                                    </div>
-                                    <p class="text-sm font-medium text-gray-800">Ditolak</p>
-                                </div>
-                                <input type="radio" name="status" value="ditolak" class="hidden" {{ $loan->status == 'ditolak' ? 'checked' : '' }}>
-                                <div class="w-4 h-4 border-2 border-gray-300 rounded-full radio-check"></div>
-                            </label>
-                        </div>
-                        
-                        <!-- Warning message -->
-                        <div class="mt-3 p-3 bg-yellow-50 border border-yellow-200 rounded-lg">
-                            <div class="flex items-start gap-2">
-                                <svg class="w-4 h-4 text-yellow-600 mt-0.5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 9v2m0 4h.01m-6.938 4h13.856c1.54 0 2.502-1.667 1.732-3L13.732 4c-.77-1.333-2.694-1.333-3.464 0L3.34 16c-.77 1.333.192 3 1.732 3z"></path>
-                                </svg>
-                                <p class="text-xs text-yellow-700">
-                                    <span class="font-medium">Perhatian:</span> Mengubah status dari 'Disetujui' ke 'Kembali' akan menambah stok alat secara otomatis.
-                                </p>
-                            </div>
+                        <label class="block text-sm font-medium text-gray-700 mb-2">Status Saat Ini</label>
+                        <div class="rounded-lg border border-gray-200 bg-gray-50 p-4 text-sm text-gray-700">
+                            {{ ucfirst($loan->status) }}
                         </div>
                     </div>
 

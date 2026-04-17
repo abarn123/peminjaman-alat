@@ -61,6 +61,8 @@
                             <th class="text-left px-6 py-3 text-xs font-medium text-gray-500 uppercase tracking-wider w-36">Tgl Pinjam</th>
                             <th class="text-left px-6 py-3 text-xs font-medium text-gray-500 uppercase tracking-wider w-44">Tgl Kembali (Aktual)</th>
                             <th class="text-left px-6 py-3 text-xs font-medium text-gray-500 uppercase tracking-wider w-28">Petugas</th>
+                            <th class="text-left px-6 py-3 text-xs font-medium text-gray-500 uppercase tracking-wider w-32">Denda</th>
+                            <th class="text-left px-6 py-3 text-xs font-medium text-gray-500 uppercase tracking-wider w-32">Status Pembayaran</th>
                             <th class="text-left px-6 py-3 text-xs font-medium text-gray-500 uppercase tracking-wider w-32">Aksi</th>
                         </tr>
                     </thead>
@@ -142,17 +144,61 @@
                                     </div>
                                 </td>
                                 <td class="px-6 py-3">
-                                    <div class="flex items-center gap-2">
-                                        @if($isLate)
-                                            <a href="{{ route('petugas.denda.formDenda', $r->id) }}" class="inline-flex items-center px-3 py-1.5 bg-orange-500 hover:bg-orange-600 text-white text-xs font-medium rounded-lg transition duration-200">
+                                    @if($r->denda > 0)
+                                        <span class="text-red-600 font-medium">Rp {{ number_format($r->denda) }}</span>
+                                    @else
+                                        <span class="text-green-600">Tidak Ada</span>
+                                    @endif
+                                </td>
+                                <td class="px-6 py-3">
+                                    @if($r->midtrans_status)
+                                        @if($r->midtrans_status === 'settlement')
+                                            <span class="inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-medium bg-green-100 text-green-800">
                                                 <svg class="w-3 h-3 mr-1" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                                                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 8c-1.657 0-3 .895-3 2s1.343 2 3 2 3 .895 3 2-1.343 2-3 2m0-8c1.11 0 2.08.402 2.599 1M12 8V7m0 1v8m0 0v1m0-1c-1.11 0-2.08-.402-2.599-1M21 12a9 9 0 11-18 0 9 9 0 0118 0z"></path>
+                                                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M5 13l4 4L19 7"></path>
                                                 </svg>
-                                                Denda
-                                            </a>
+                                                Lunas
+                                            </span>
+                                        @elseif($r->midtrans_status === 'pending')
+                                            <span class="inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-medium bg-yellow-100 text-yellow-800">
+                                                Pending
+                                            </span>
                                         @else
-                                            <span class="text-gray-400">-</span>
+                                            <span class="inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-medium bg-red-100 text-red-800">
+                                                {{ ucfirst($r->midtrans_status) }}
+                                            </span>
                                         @endif
+                                    @else
+                                        <span class="text-gray-500">Belum Dibuat</span>
+                                    @endif
+                                </td>
+                                <td class="px-6 py-3">
+                                    <div class="flex items-center gap-2">
+                                        @if($isLate && $r->denda > 0 && !$r->midtrans_status)
+                                            <form action="{{ route('petugas.denda.generateLink', $r->id) }}" method="POST" class="inline">
+                                                @csrf
+                                                <button type="submit" class="inline-flex items-center px-3 py-1.5 bg-blue-600 hover:bg-blue-700 text-white text-xs font-medium rounded-lg transition duration-200">
+                                                    <svg class="w-3 h-3 mr-1" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M13.828 10.172a4 4 0 00-5.656 0l-4 4a4 4 0 105.656 5.656l1.102-1.101m-.758-4.899a4 4 0 005.656 0l4-4a4 4 0 00-5.656-5.656l-1.1 1.1"></path>
+                                                    </svg>
+                                                    Generate Link
+                                                </button>
+                                            </form>
+                                        @elseif($r->midtrans_status === 'settlement')
+                                            <a href="{{ route('petugas.denda.showBukti', $r->id) }}" class="inline-flex items-center px-3 py-1.5 bg-green-600 hover:bg-green-700 text-white text-xs font-medium rounded-lg transition duration-200">
+                                                <svg class="w-3 h-3 mr-1" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 12a3 3 0 11-6 0 3 3 0 016 0z"></path>
+                                                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M2.458 12C3.732 7.943 7.523 5 12 5c4.478 0 8.268 2.943 9.542 7-1.274 4.057-5.064 7-9.542 7-4.477 0-8.268-2.943-9.542-7z"></path>
+                                                </svg>
+                                                Lihat Bukti
+                                            </a>
+                                        @endif
+                                        <a href="{{ route('petugas.denda.formDenda', $r->id) }}" class="inline-flex items-center px-3 py-1.5 bg-gray-600 hover:bg-gray-700 text-white text-xs font-medium rounded-lg transition duration-200">
+                                            <svg class="w-3 h-3 mr-1" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M11 5H6a2 2 0 00-2 2v11a2 2 0 002 2h11a2 2 0 002-2v-5m-1.414-9.414a2 2 0 112.828 2.828L11.828 15H9v-2.828l8.586-8.586z"></path>
+                                            </svg>
+                                            Edit Denda
+                                        </a>
                                     </div>
                                 </td>
                             </tr>
@@ -178,4 +224,88 @@
             </div>
         @endif
     </div>
+
+    <!-- Modal Lihat Bukti Pembayaran -->
+    {{-- Modal untuk petugas melihat bukti pembayaran denda dari peminjam --}}
+    <div id="viewProofModal" class="fixed inset-0 z-50 hidden items-center justify-center p-4 overflow-y-auto">
+        <div id="viewProofBackdrop" class="fixed inset-0 bg-black/50 backdrop-blur-sm"></div>
+        
+        <div class="relative w-full max-w-md bg-white rounded-2xl shadow-2xl border border-gray-100 overflow-hidden transform transition-all duration-300 my-8 mx-auto flex flex-col">
+            {{-- Header modal --}}
+            <div class="bg-blue-600 px-5 py-4 flex-shrink-0">
+                <div class="flex items-center justify-between">
+                    <div class="flex items-center gap-3">
+                        <div class="w-10 h-10 bg-white/20 rounded-full flex items-center justify-center">
+                            <svg class="w-5 h-5 text-white" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 12a3 3 0 11-6 0 3 3 0 016 0z"></path>
+                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M2.458 12C3.732 7.943 7.523 5 12 5c4.478 0 8.268 2.943 9.542 7-1.274 4.057-5.064 7-9.542 7-4.477 0-8.268-2.943-9.542-7z"></path>
+                            </svg>
+                        </div>
+                        <div>
+                            <h5 class="text-lg font-bold text-white">Bukti Pembayaran Denda</h5>
+                            <p class="text-xs text-blue-100">Verifikasi bukti dari peminjam</p>
+                        </div>
+                    </div>
+                    <button id="closeViewProofModal" type="button" class="w-8 h-8 flex items-center justify-center bg-white/10 hover:bg-white/20 rounded-full text-white transition-colors text-xl">
+                        &times;
+                    </button>
+                </div>
+            </div>
+
+            {{-- Body modal menampilkan gambar --}}
+            <div class="px-5 py-5 bg-gray-50 overflow-y-auto flex-1 text-center">
+                <img id="viewProofImage" src="" class="w-full max-h-96 object-contain rounded-lg border border-gray-200">
+            </div>
+
+            {{-- Footer modal --}}
+            <div class="px-5 py-4 bg-white border-t border-gray-100 flex-shrink-0">
+                <button id="closeViewProofModalBtn" type="button" class="w-full inline-flex items-center justify-center px-4 py-2.5 bg-gray-100 hover:bg-gray-200 text-gray-700 text-sm font-medium rounded-xl transition duration-200">
+                    Tutup
+                </button>
+            </div>
+        </div>
+    </div>
+
+    <script>
+    document.addEventListener('DOMContentLoaded', function() {
+        // ===== View Proof Modal Scripts =====
+        const viewProofModal = document.getElementById('viewProofModal');
+        const viewProofBackdrop = document.getElementById('viewProofBackdrop');
+        const closeViewProofBtn = document.getElementById('closeViewProofModal');
+        const closeViewProofBtnFooter = document.getElementById('closeViewProofModalBtn');
+        const viewProofTriggers = document.querySelectorAll('[data-open-proof-modal="true"]');
+        const viewProofImage = document.getElementById('viewProofImage');
+
+        function openViewProofModal(button) {
+            const proofSrc = button.getAttribute('data-proof-src');
+            viewProofImage.src = proofSrc;
+            viewProofModal.classList.remove('hidden');
+            viewProofModal.classList.add('flex');
+            document.body.style.overflow = 'hidden';
+        }
+
+        function closeViewProofModal() {
+            viewProofModal.classList.add('hidden');
+            viewProofModal.classList.remove('flex');
+            document.body.style.overflow = '';
+            viewProofImage.src = '';
+        }
+
+        viewProofTriggers.forEach(function(button) {
+            button.addEventListener('click', function() {
+                openViewProofModal(button);
+            });
+        });
+
+        if (viewProofBackdrop) viewProofBackdrop.addEventListener('click', closeViewProofModal);
+        if (closeViewProofBtn) closeViewProofBtn.addEventListener('click', closeViewProofModal);
+        if (closeViewProofBtnFooter) closeViewProofBtnFooter.addEventListener('click', closeViewProofModal);
+
+        document.addEventListener('keydown', function(event) {
+            if (event.key === 'Escape' && !viewProofModal.classList.contains('hidden')) {
+                closeViewProofModal();
+            }
+        });
+    });
+    </script>
 @endsection

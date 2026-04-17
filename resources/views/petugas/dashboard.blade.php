@@ -250,7 +250,7 @@
                                         </button>
                                     </form>
                                 </td>
-                            </tr>
+                            <tr>
                         @endforeach
                     </tbody>
                 </table>
@@ -297,10 +297,11 @@
                 <table class="w-full">
                     <thead class="bg-gray-50">
                         <tr class="border-b border-gray-200">
-                            <th class="text-left px-6 py-3 text-xs font-medium text-gray-500 uppercase tracking-wider">Peminjam</th>
+                            <th class="text-left px-6 py-3 text-xs font-medium text-gray-500 uppercase tracking-wider w-32">Peminjam</th>
                             <th class="text-left px-6 py-3 text-xs font-medium text-gray-500 uppercase tracking-wider">Alat</th>
-                            <th class="text-left px-6 py-3 text-xs font-medium text-gray-500 uppercase tracking-wider">Status Peminjaman</th>
-                            <th class="text-left px-6 py-3 text-xs font-medium text-gray-500 uppercase tracking-wider">Status Kembali</th>
+                            <th class="text-left px-6 py-3 text-xs font-medium text-gray-500 uppercase tracking-wider w-32">Status Peminjaman</th>
+                            <th class="text-left px-6 py-3 text-xs font-medium text-gray-500 uppercase tracking-wider w-32">Status Kembali</th>
+                            <th class="text-left px-6 py-3 text-xs font-medium text-gray-500 uppercase tracking-wider w-28">Bukti</th>
                         </tr>
                     </thead>
                     <tbody id="returnedTableBody" class="divide-y divide-gray-100">
@@ -309,6 +310,7 @@
                                 $rencana = strtotime($sudah->tanggal_kembali_rencana);
                                 $aktual = strtotime($sudah->tanggal_kembali_aktual);
                                 $isLate = $aktual > $rencana;
+                                $daysLate = $isLate ? floor(($aktual - $rencana) / (60 * 60 * 24)) : 0;
                             @endphp
                             <tr class="hover:bg-gray-50 transition returned-row" data-name="{{ strtolower($sudah->user->name) }}" data-email="{{ strtolower($sudah->user->email) }}">
                                 <td class="px-6 py-3">
@@ -357,10 +359,7 @@
                                             <svg class="w-3 h-3 mr-1" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                                                 <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 8v4l3 3m6-3a9 9 0 11-18 0 9 9 0 0118 0z"></path>
                                             </svg>
-                                            Telat
-                                            <span class="ml-1 text-xs font-normal">
-                                                ({{ floor(($aktual - $rencana) / (60 * 60 * 24)) }} hari)
-                                            </span>
+                                            Telat {{ $daysLate }} hari
                                         </span>
                                     @else
                                         <span class="inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-medium bg-green-100 text-green-800">
@@ -369,6 +368,38 @@
                                             </svg>
                                             Tepat Waktu
                                         </span>
+                                    @endif
+                                </td>
+                                <td class="px-6 py-3">
+                                    @if($sudah->return_proof_image_path)
+                                        <button type="button" 
+                                                onclick="openImageModal('{{ asset('storage/' . $sudah->return_proof_image_path) }}')"
+                                                class="inline-flex items-center justify-center px-2 py-1 bg-blue-100 hover:bg-blue-200 text-blue-700 text-xs font-medium rounded-lg transition duration-200">
+                                            <svg class="w-3 h-3 mr-1" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 12H9m0 0l3-3m-3 3l3 3"></path>
+                                            </svg>
+                                            Lihat
+                                        </button>
+                                    @else
+                                        <form action="{{ url('/petugas/return-proof/'.$sudah->id) }}" method="POST" enctype="multipart/form-data" class="flex flex-col gap-1">
+                                            @csrf
+                                            <div class="relative">
+                                                <input type="file" name="return_proof_image" accept="image/*" id="file-{{ $sudah->id }}" class="hidden">
+                                                <label for="file-{{ $sudah->id }}" class="inline-flex items-center justify-center w-full px-2 py-1 bg-gray-100 hover:bg-gray-200 text-gray-600 text-xs font-medium rounded-lg cursor-pointer transition duration-200">
+                                                    <svg class="w-3 h-3 mr-1" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 16v1a3 3 0 003 3h10a3 3 0 003-3v-1m-4-8l-4-4m0 0L8 8m4-4v12"></path>
+                                                    </svg>
+                                                    Pilih File
+                                                </label>
+                                                <span id="filename-{{ $sudah->id }}" class="text-xs text-gray-500 ml-1 hidden"></span>
+                                            </div>                       
+                                            <button type="submit" class="inline-flex items-center justify-center px-2 py-1 bg-green-600 hover:bg-green-700 text-white text-xs font-medium rounded-lg transition duration-200">
+                                                <svg class="w-3 h-3 mr-1" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 16v1a3 3 0 003 3h10a3 3 0 003-3v-1m-4-8l-4-4m0 0L8 8m4-4v12"></path>
+                                                </svg>
+                                                Upload
+                                            </button>
+                                        </form>
                                     @endif
                                 </td>
                             </tr>
@@ -381,6 +412,16 @@
             @endif
         </div>
     </div>
+
+    <!-- Modal Preview Gambar -->
+    <div id="imageModal" class="fixed inset-0 z-50 hidden items-center justify-center" style="background: rgba(0,0,0,0.85);">
+    <div class="relative">
+        <button id="closeImageModalBtn" class="absolute -top-10 right-0 text-white hover:text-gray-300 text-4xl font-bold">
+            &times;
+        </button>
+        <img id="modalImage" src="" alt="Bukti Pengembalian" class="max-w-[90vw] max-h-[85vh] object-contain rounded-lg">
+    </div>
+</div>
 
     <script>
         // Search function untuk tabel Menunggu Persetujuan
@@ -420,5 +461,70 @@
         initSearch('searchPending', '.pending-row', 'pendingNoResult');
         initSearch('searchActive', '.active-row', 'activeNoResult');
         initSearch('searchReturned', '.returned-row', 'returnedNoResult');
+
+
+        // MODAL PREVIEW GAMBAR
+            const imageModal = document.getElementById('imageModal');
+            const modalImage = document.getElementById('modalImage');
+            const closeImageModalBtn = document.getElementById('closeImageModalBtn');
+            const closeImageModalFooterBtn = document.getElementById('closeImageModalFooterBtn');
+
+            function openImageModal(imageSrc) {
+                modalImage.src = imageSrc;
+                imageModal.classList.remove('hidden');
+                imageModal.classList.add('flex');
+                document.body.style.overflow = 'hidden';
+            }
+
+            function closeImageModal() {
+                imageModal.classList.add('hidden');
+                imageModal.classList.remove('flex');
+                modalImage.src = '';
+                document.body.style.overflow = '';
+            }
+
+            if (closeImageModalBtn) closeImageModalBtn.addEventListener('click', closeImageModal);
+            if (closeImageModalFooterBtn) closeImageModalFooterBtn.addEventListener('click', closeImageModal);
+
+            // Klik di luar gambar juga tutup
+            imageModal.addEventListener('click', function(e) {
+                if (e.target === imageModal) {
+                    closeImageModal();
+                }
+            });
+
+            // Tutup dengan tombol ESC
+            document.addEventListener('keydown', function(event) {
+                if (event.key === 'Escape' && imageModal && !imageModal.classList.contains('hidden')) {
+                    closeImageModal();
+                }
+            });
+
+        if (closeImageModalBtn) closeImageModalBtn.addEventListener('click', closeImageModal);
+        if (closeImageModalFooterBtn) closeImageModalFooterBtn.addEventListener('click', closeImageModal);
+        if (imageModalBackdrop) imageModalBackdrop.addEventListener('click', closeImageModal);
+
+
+        
+        // TAMPILKAN NAMA FILE YANG DIPILIH
+        @foreach($sudahDikembalikan as $sudah)
+        (function() {
+            const fileInput = document.getElementById('file-{{ $sudah->id }}');
+            const fileNameSpan = document.getElementById('filename-{{ $sudah->id }}');
+            
+            if (fileInput && fileNameSpan) {
+                fileInput.addEventListener('change', function(e) {
+                    const fileName = e.target.files[0]?.name;
+                    if (fileName) {
+                        const shortName = fileName.length > 20 ? fileName.substring(0, 17) + '...' : fileName;
+                        fileNameSpan.textContent = shortName;
+                        fileNameSpan.classList.remove('hidden');
+                    } else {
+                        fileNameSpan.classList.add('hidden');
+                    }
+                });
+            }
+        })();
+        @endforeach
     </script>
 @endsection
